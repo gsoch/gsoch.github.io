@@ -60,22 +60,22 @@ export default function Hero() {
   };
 
   return (
-    <section id="home" className="relative min-h-screen bg-stone-50 text-stone-900">
-      <div className="mx-auto grid min-h-screen max-w-400 grid-cols-1 md:grid-cols-2 items-start md:items-center gap-10 md:gap-16 px-4 md:px-12 py-16 md:py-10 mt-18 md:mt-0">
+    <section id="home" className="relative min-h-dvh bg-stone-50 text-stone-900">
+      <div className="mx-auto grid min-h-dvh max-w-400 grid-cols-1 md:grid-cols-2 items-start md:items-center gap-8 md:gap-16 px-4 md:px-12 py-14 md:py-10 mt-18 md:mt-0">
 
         {/* LEFT */}
-        <div className="flex flex-col justify-center space-y-6 md:space-y-8 mb-15">
+        <div className="flex flex-col justify-center space-y-5 md:space-y-8 mb-10 md:mb-15">
 
-          <div className="inline-flex w-fit items-start md:items-center rounded-full border border-stone-300 bg-white/60 px-4 py-1 text-sm tracking-[0.2em] uppercase backdrop-blur-sm">
-            MASc &middot; Computer Engineering &middot; University of Toronto
+          <div className="inline-flex w-fit items-center rounded-full border border-stone-300 bg-white/60 px-3 py-1 md:px-4 text-xs md:text-sm tracking-[0.15em] md:tracking-[0.2em] uppercase backdrop-blur-sm">
+            MASc &middot; Computer Engineering &middot; UofT
           </div>
 
           <div className="space-y-3 md:space-y-4">
-            <h1 className="font-sans text-4xl md:text-7xl tracking-tight">
+            <h1 className="font-sans font-bold text-5xl sm:text-6xl md:text-7xl tracking-tight">
               Gabriel Oña
             </h1>
 
-            <p className="text-sm md:text-lg leading-6 md:leading-7 text-stone-600">
+            <p className="text-base md:text-lg leading-6 md:leading-7 text-stone-600 max-w-md">
               Hardware/software co-design engineer specializing in large-scale HPC and AI systems &mdash; building
               FPGA/ASIC in-network accelerators and simulation infrastructure for distributed AI workloads.
             </p>
@@ -83,7 +83,7 @@ export default function Hero() {
 
           <div className="flex flex-wrap gap-3 md:gap-4">
             <a
-              href="#projects"
+              href="#work"
               className="rounded-md bg-stone-900 px-5 py-3 text-sm text-white hover:bg-stone-800 transition"
             >
               View Projects
@@ -100,7 +100,7 @@ export default function Hero() {
         </div>
 
         {/* RIGHT */}
-        <div className="flex items-center justify-center px-2 md:px-0">
+        <div className="flex items-center justify-center">
           <div className="w-full max-w-xl rounded-2xl border border-stone-200 bg-white/60 backdrop-blur-xl shadow-sm p-4 md:p-6 space-y-5 md:space-y-6">
 
             {/* Header */}
