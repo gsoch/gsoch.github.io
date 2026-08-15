@@ -121,11 +121,22 @@ export default function TopologyPanel({
     });
   };
 
+  // Real leaf-switch oversubscription ratio (downlinks-to-GPUs : uplinks-to-spine)
+  // for this CLOS fabric — derived from the actual generated topology, not a
+  // label (mirrors SystemConfig.IB_BLOCKING_FACTOR's own "2.0 = 2:1 blocking"
+  // convention in hw/network/topology.py).
+  const blockingRatio = useMemo(() => {
+    const numSpines = data.nodes.filter((n) => n.type === "spine_switch").length;
+    if (!numSpines) return null;
+    const ratio = data.gpus_per_rack / numSpines;
+    return Number.isInteger(ratio) ? `${ratio}:1` : `${ratio.toFixed(1)}:1`;
+  }, [data]);
+
   return (
     <div className="space-y-3">
       <div className="text-xs text-stone-500">
-        {data.world_size} GPUs &middot; {data.num_racks} racks &times; {data.gpus_per_rack}/rack &middot;{" "}
-        {data.inter_rack} (two-level fat-tree) inter-rack fabric
+        {data.world_size} GPUs &middot; {data.num_racks} racks &times; {data.gpus_per_rack}/rack &middot; {data.inter_rack}
+        {blockingRatio && ` ${blockingRatio}`}
       </div>
 
       <svg
@@ -257,7 +268,7 @@ export default function TopologyPanel({
             <span className="text-stone-600">{LINK_LABELS[t]}</span>
           </button>
         ))}
-        <span className="ml-auto flex items-center gap-1.5 text-stone-400">
+        <span className="ml-auto flex items-center gap-1.5 text-stone-600">
           <span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: "#bce7a5" }} />
           NVSwitch &middot;
           <span className="inline-block w-2.5 h-2.5 rounded-full bg-stone-900" />
