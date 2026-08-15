@@ -111,7 +111,8 @@ export default function Navbar() {
             {/* CTA Button */}
             <motion.a
               href={profile.cv}
-              download
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-6 py-2 bg-black text-white rounded-full font-medium hover:bg-zinc-800 transition-colors"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -183,7 +184,8 @@ export default function Navbar() {
 
             <motion.a
               href={profile.cv}
-              download
+              target="_blank"
+              rel="noopener noreferrer"
               className="block w-full text-center px-6 py-3 bg-black text-white rounded-xl font-medium mt-4"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: isOpen ? 1 : 0, x: isOpen ? 0 : -20 }}
