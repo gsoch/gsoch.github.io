@@ -16,24 +16,37 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 const ROTATE_MS = 10000;
+// A click on a panel's own sub-controls (implementation/cluster toggles)
+// means someone is actively reading that plot, not just browsing tabs — give
+// it a longer hold than a plain tab click before the carousel resumes.
+const INTERACT_HOLD_MS = 20000;
 
 export default function HDESShowcase() {
   const [tab, setTab] = useState<TabId>("topology");
+  const [delay, setDelay] = useState(ROTATE_MS);
 
-  // Auto-rotate through the tabs every 10s. A manual click restarts the
-  // interval (effect re-runs on every `tab` change, click or auto-advance
-  // alike), so clicking always buys a fresh 10s before it moves on again.
+  // Auto-rotate through the tabs. The interval restarts whenever `tab` or
+  // `delay` changes — a tab click (delay stays at ROTATE_MS) or a
+  // sub-control click (delay bumped to INTERACT_HOLD_MS via onInteract)
+  // both buy a fresh wait before it advances again; each auto-advance
+  // resets delay back to the normal cadence.
   useEffect(() => {
     const id = setInterval(() => {
       setTab((current) => {
         const idx = TABS.findIndex((t) => t.id === current);
         return TABS[(idx + 1) % TABS.length].id;
       });
-    }, ROTATE_MS);
+      setDelay(ROTATE_MS);
+    }, delay);
     return () => clearInterval(id);
-  }, [tab]);
+  }, [tab, delay]);
 
-  const selectTab = (id: TabId) => setTab(id);
+  const selectTab = (id: TabId) => {
+    setTab(id);
+    setDelay(ROTATE_MS);
+  };
+
+  const onInteract = () => setDelay(INTERACT_HOLD_MS);
 
   return (
     <div className="w-full max-w-2xl rounded-2xl border border-stone-200 bg-white/60 backdrop-blur-xl shadow-sm p-4 md:p-6 space-y-5 md:space-y-6">
@@ -71,10 +84,10 @@ export default function HDESShowcase() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.35, ease: "easeInOut" }}
         >
-          {tab === "topology" && <TopologyPanel data={topology} />}
-          {tab === "network" && <NetworkPanel data={network} />}
-          {tab === "roofline" && <RooflinePanel data={roofline} />}
-          {tab === "gpu" && <GpuUtilPanel data={gpuUtil} />}
+          {tab === "topology" && <TopologyPanel data={topology} onInteract={onInteract} />}
+          {tab === "network" && <NetworkPanel data={network} onInteract={onInteract} />}
+          {tab === "roofline" && <RooflinePanel data={roofline} onInteract={onInteract} />}
+          {tab === "gpu" && <GpuUtilPanel data={gpuUtil} onInteract={onInteract} />}
         </motion.div>
       </AnimatePresence>
     </div>

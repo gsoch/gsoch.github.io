@@ -90,7 +90,13 @@ const NODE_STYLE: Record<string, { r: number; fill: string; stroke: string }> = 
   spine_switch: { r: 10, fill: "#1c1917", stroke: "#1c1917" },
 };
 
-export default function TopologyPanel({ data }: { data: TopologyData }) {
+export default function TopologyPanel({
+  data,
+  onInteract,
+}: {
+  data: TopologyData;
+  onInteract?: () => void;
+}) {
   const { pos: positions, ovals } = useMemo(() => layout(data), [data]);
   const [hovered, setHovered] = useState<string | null>(null);
   const [hiddenTypes, setHiddenTypes] = useState<Set<LinkType>>(new Set());
@@ -238,7 +244,10 @@ export default function TopologyPanel({ data }: { data: TopologyData }) {
         {(Object.keys(LINK_COLORS) as LinkType[]).map((t) => (
           <button
             key={t}
-            onClick={() => toggleType(t)}
+            onClick={() => {
+              toggleType(t);
+              onInteract?.();
+            }}
             className={`flex items-center gap-1.5 ${hiddenTypes.has(t) ? "opacity-40" : ""}`}
           >
             <span

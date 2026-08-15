@@ -30,7 +30,13 @@ const GANTT_ROW_H = 20;
 const GANTT_ROW_Y = [8, 34];
 const GANTT_ROW_LABELS = ["Comm", "Compute"];
 
-export default function NetworkPanel({ data }: { data: Record<string, NetworkData> }) {
+export default function NetworkPanel({
+  data,
+  onInteract,
+}: {
+  data: Record<string, NetworkData>;
+  onInteract?: () => void;
+}) {
   const modes = useMemo(() => Object.keys(data), [data]);
   const [mode, setMode] = useState(modes[0] ?? "naive");
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
@@ -99,7 +105,10 @@ export default function NetworkPanel({ data }: { data: Record<string, NetworkDat
           {modes.map((m) => (
             <button
               key={m}
-              onClick={() => setMode(m)}
+              onClick={() => {
+                setMode(m);
+                onInteract?.();
+              }}
               className={`px-2.5 py-1 rounded-full transition-colors ${
                 mode === m ? "bg-stone-900 text-white" : "text-stone-600 hover:text-stone-900"
               }`}
