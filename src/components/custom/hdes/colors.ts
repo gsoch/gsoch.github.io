@@ -68,6 +68,16 @@ export const MODE_CEILING_DASH: Record<string, string | undefined> = {
   archipelago: "1.5 2.5",
 };
 
+// Sequential ramp for the GPU utilization heatmap — single hue (indigo,
+// distinct from the link/phase/mode hues used elsewhere on this widget),
+// light -> dark as SM-weighted busy fraction rises from 0 -> 1.
+export function utilizationColor(frac: number): string {
+  const t = Math.max(0, Math.min(1, frac));
+  const lightness = 94 - t * 62; // 94% (near-white, idle) -> 32% (dark, saturated)
+  const saturation = 15 + t * 55;
+  return `hsl(243, ${saturation.toFixed(0)}%, ${lightness.toFixed(0)}%)`;
+}
+
 export const NODE_LABELS: Record<string, string> = {
   gpu: "GPU",
   nvswitch: "NVSwitch",
