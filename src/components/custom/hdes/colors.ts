@@ -10,15 +10,15 @@ export const LINK_COLORS = {
 export const LINK_LABELS = {
   nv: "NVLink",
   pcie: "PCIe",
-  eth: "Ethernet / IB",
+  eth: "ETH/IB",
 } as const;
 
 // Compact abbreviations for tight single-row layouts (e.g. the network
-// chart's hover readout), where LINK_LABELS' "Ethernet / IB" would wrap.
+// chart's hover readout), where LINK_LABELS' "ETH/IB" would wrap.
 export const LINK_SHORT = {
   nv: "NV",
   pcie: "PCIe",
-  eth: "Eth",
+  eth: "ETH",
 } as const;
 
 export type LinkType = keyof typeof LINK_COLORS;

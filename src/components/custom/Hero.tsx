@@ -18,7 +18,7 @@ export default function Hero() {
             </h1>
 
             <p className="text-base md:text-lg leading-6 md:leading-7 text-stone-600 max-w-md">
-              Hardware/software co-design engineer specializing in large-scale HPC and AI systems
+              Hardware/software co-design engineer specializing in large-scale HPC and AI systems.
             </p>
           </div>
 

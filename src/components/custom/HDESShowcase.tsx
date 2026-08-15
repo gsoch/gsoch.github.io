@@ -57,7 +57,7 @@ export default function HDESShowcase() {
   return (
     <div className="w-full max-w-2xl rounded-2xl border border-stone-200 bg-white/60 backdrop-blur-xl shadow-sm p-4 md:p-6 space-y-5 md:space-y-6">
       <div>
-        <div className="text-sm text-stone-500">HDES &middot; Discrete-Event Simulator</div>
+        <div className="text-sm text-stone-500">HDES &middot; Heterogeneous Discrete-Event Simulator</div>
         <div className="text-lg font-medium">Distributed MoE Communication</div>
       </div>
 

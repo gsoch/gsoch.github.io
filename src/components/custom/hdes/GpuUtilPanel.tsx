@@ -21,33 +21,36 @@ export default function GpuUtilPanel({
 
   const d = data[mode];
   const plotW = WIDTH - PAD_L - PAD_R;
-  const cellW = plotW / d.n_bins;
   const chartH = d.gpu_ids.length * ROW_H;
+
+  // Fixed time axis shared across every implementation (the slowest mode's
+  // own end time), so switching modes shows the real speedup directly — a
+  // faster implementation's heatmap visibly stops short of the right edge
+  // instead of every mode stretching to fill the same width regardless of
+  // how long it actually took.
+  const sharedMaxUs = useMemo(() => Math.max(...modes.map((m) => data[m].sim_end_us)), [data, modes]);
+  const xAtUs = (us: number) => PAD_L + (us / sharedMaxUs) * plotW;
+  const cellW = (d.sim_end_us / sharedMaxUs) * (plotW / d.n_bins);
 
   const shortId = (id: string) => id.replace("rack", "r").replace("-gpu", "/g");
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex rounded-full bg-stone-100 p-0.5 text-xs">
-          {modes.map((m) => (
-            <button
-              key={m}
-              onClick={() => {
-                setMode(m);
-                onInteract?.();
-              }}
-              className={`px-2.5 py-1 rounded-full transition-colors ${
-                mode === m ? "bg-stone-900 text-white" : "text-stone-600 hover:text-stone-900"
-              }`}
-            >
-              {MODE_LABELS[m] ?? m}
-            </button>
-          ))}
-        </div>
-        <div className="text-xs text-stone-500">
-          avg {(d.avg_utilization * 100).toFixed(0)}% &middot; peak {d.peak_gpu ? shortId(d.peak_gpu) : "—"}
-        </div>
+      <div className="flex rounded-full bg-stone-100 p-0.5 text-xs w-fit">
+        {modes.map((m) => (
+          <button
+            key={m}
+            onClick={() => {
+              setMode(m);
+              onInteract?.();
+            }}
+            className={`px-2.5 py-1 rounded-full transition-colors ${
+              mode === m ? "bg-stone-900 text-white" : "text-stone-600 hover:text-stone-900"
+            }`}
+          >
+            {MODE_LABELS[m] ?? m}
+          </button>
+        ))}
       </div>
 
       <svg
@@ -71,7 +74,7 @@ export default function GpuUtilPanel({
           row.map((v, ci) => (
             <rect
               key={`${ri}-${ci}`}
-              x={PAD_L + ci * cellW}
+              x={xAtUs((ci / d.n_bins) * d.sim_end_us)}
               y={ri * ROW_H}
               width={cellW + 0.5}
               height={ROW_H}
@@ -85,11 +88,25 @@ export default function GpuUtilPanel({
           )),
         )}
 
+        {/* marks where this mode's own run actually ends, when it finishes
+            before the slowest mode on the shared axis */}
+        {d.sim_end_us < sharedMaxUs * 0.995 && (
+          <line
+            x1={xAtUs(d.sim_end_us)}
+            x2={xAtUs(d.sim_end_us)}
+            y1={0}
+            y2={chartH}
+            stroke="#a8a29e"
+            strokeWidth={1}
+            strokeDasharray="1 2"
+          />
+        )}
+
         <text x={PAD_L} y={chartH + 14} fontSize={8} fill="#78716c">
           0
         </text>
         <text x={WIDTH - PAD_R} y={chartH + 14} fontSize={8} fill="#78716c" textAnchor="end">
-          {d.sim_end_us.toLocaleString()} &micro;s
+          {Math.round(sharedMaxUs).toLocaleString()} &micro;s
         </text>
       </svg>
 
