@@ -17,14 +17,9 @@ export default function HDESShowcase() {
 
   return (
     <div className="w-full max-w-2xl rounded-2xl border border-stone-200 bg-white/60 backdrop-blur-xl shadow-sm p-4 md:p-6 space-y-5 md:space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <div className="text-sm text-stone-500">HDES &middot; Discrete-Event Simulator</div>
-          <div className="text-lg font-medium">Distributed MoE Communication</div>
-        </div>
-        <div className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-700 shrink-0">
-          Real simulator output
-        </div>
+      <div>
+        <div className="text-sm text-stone-500">HDES &middot; Discrete-Event Simulator</div>
+        <div className="text-lg font-medium">Distributed MoE Communication</div>
       </div>
 
       <div className="flex rounded-full bg-stone-100 p-0.5 text-sm w-fit">
