@@ -24,12 +24,14 @@ const INTERACT_HOLD_MS = 20000;
 export default function HDESShowcase() {
   const [tab, setTab] = useState<TabId>("topology");
   const [delay, setDelay] = useState(ROTATE_MS);
+  // Bumped on every interaction so the effect below always restarts the
+  // interval, even when `delay` is set to the same value it already had
+  // (e.g. clicking Imp. 1 then Imp. 2 both set delay=INTERACT_HOLD_MS —
+  // React bails out of re-running effects when a state setter receives an
+  // unchanged value, so without this second click wouldn't actually reset
+  // the countdown, just leave the first click's timer running).
+  const [resetTick, setResetTick] = useState(0);
 
-  // Auto-rotate through the tabs. The interval restarts whenever `tab` or
-  // `delay` changes — a tab click (delay stays at ROTATE_MS) or a
-  // sub-control click (delay bumped to INTERACT_HOLD_MS via onInteract)
-  // both buy a fresh wait before it advances again; each auto-advance
-  // resets delay back to the normal cadence.
   useEffect(() => {
     const id = setInterval(() => {
       setTab((current) => {
@@ -39,14 +41,18 @@ export default function HDESShowcase() {
       setDelay(ROTATE_MS);
     }, delay);
     return () => clearInterval(id);
-  }, [tab, delay]);
+  }, [tab, delay, resetTick]);
 
   const selectTab = (id: TabId) => {
     setTab(id);
     setDelay(ROTATE_MS);
+    setResetTick((n) => n + 1);
   };
 
-  const onInteract = () => setDelay(INTERACT_HOLD_MS);
+  const onInteract = () => {
+    setDelay(INTERACT_HOLD_MS);
+    setResetTick((n) => n + 1);
+  };
 
   return (
     <div className="w-full max-w-2xl rounded-2xl border border-stone-200 bg-white/60 backdrop-blur-xl shadow-sm p-4 md:p-6 space-y-5 md:space-y-6">
