@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { topology, network, roofline, gpuUtil } from "@/data/hdes";
 import TopologyPanel from "@/components/custom/hdes/TopologyPanel";
 import NetworkPanel from "@/components/custom/hdes/NetworkPanel";
@@ -14,14 +15,14 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
-const ROTATE_MS = 5000;
+const ROTATE_MS = 10000;
 
 export default function HDESShowcase() {
   const [tab, setTab] = useState<TabId>("topology");
 
-  // Auto-rotate through the tabs every 5s; a manual click restarts the
-  // interval instead of fighting it (so the tab you just picked stays put
-  // for a full 5s before advancing again).
+  // Auto-rotate through the tabs every 10s. A manual click restarts the
+  // interval (effect re-runs on every `tab` change, click or auto-advance
+  // alike), so clicking always buys a fresh 10s before it moves on again.
   useEffect(() => {
     const id = setInterval(() => {
       setTab((current) => {
@@ -31,6 +32,8 @@ export default function HDESShowcase() {
     }, ROTATE_MS);
     return () => clearInterval(id);
   }, [tab]);
+
+  const selectTab = (id: TabId) => setTab(id);
 
   return (
     <div className="w-full max-w-2xl rounded-2xl border border-stone-200 bg-white/60 backdrop-blur-xl shadow-sm p-4 md:p-6 space-y-5 md:space-y-6">
@@ -43,20 +46,37 @@ export default function HDESShowcase() {
         {TABS.map((t) => (
           <button
             key={t.id}
-            onClick={() => setTab(t.id)}
-            className={`px-4 py-1.5 rounded-full transition-colors ${
-              tab === t.id ? "bg-stone-900 text-white" : "text-stone-600 hover:text-stone-900"
+            onClick={() => selectTab(t.id)}
+            className={`relative px-4 py-1.5 rounded-full transition-colors ${
+              tab === t.id ? "text-white" : "text-stone-600 hover:text-stone-900"
             }`}
           >
-            {t.label}
+            {tab === t.id && (
+              <motion.div
+                layoutId="hdesActiveTab"
+                className="absolute inset-0 bg-stone-900 rounded-full"
+                transition={{ type: "spring", stiffness: 420, damping: 34 }}
+              />
+            )}
+            <span className="relative z-10">{t.label}</span>
           </button>
         ))}
       </div>
 
-      {tab === "topology" && <TopologyPanel data={topology} />}
-      {tab === "network" && <NetworkPanel data={network} />}
-      {tab === "roofline" && <RooflinePanel data={roofline} />}
-      {tab === "gpu" && <GpuUtilPanel data={gpuUtil} />}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={tab}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.35, ease: "easeInOut" }}
+        >
+          {tab === "topology" && <TopologyPanel data={topology} />}
+          {tab === "network" && <NetworkPanel data={network} />}
+          {tab === "roofline" && <RooflinePanel data={roofline} />}
+          {tab === "gpu" && <GpuUtilPanel data={gpuUtil} />}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
