@@ -51,7 +51,13 @@ function Marker({
   }
 }
 
-export default function RooflinePanel({ data }: { data: RooflineData }) {
+export default function RooflinePanel({
+  data,
+  onInteract,
+}: {
+  data: RooflineData;
+  onInteract?: () => void;
+}) {
   const clusters = useMemo(
     () => Array.from(new Set(data.results.map((r) => r.cluster))).sort((a, b) => a - b),
     [data],
@@ -166,7 +172,10 @@ export default function RooflinePanel({ data }: { data: RooflineData }) {
         {clusters.map((c) => (
           <button
             key={c}
-            onClick={() => setCluster(c)}
+            onClick={() => {
+              setCluster(c);
+              onInteract?.();
+            }}
             className={`px-2.5 py-1 rounded-full transition-colors ${
               cluster === c ? "bg-stone-900 text-white" : "text-stone-600 hover:text-stone-900"
             }`}

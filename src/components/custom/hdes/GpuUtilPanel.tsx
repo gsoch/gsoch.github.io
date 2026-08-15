@@ -8,7 +8,13 @@ const PAD_R = 12;
 const PAD_B = 20;
 const ROW_H = 13;
 
-export default function GpuUtilPanel({ data }: { data: Record<string, GpuUtilData> }) {
+export default function GpuUtilPanel({
+  data,
+  onInteract,
+}: {
+  data: Record<string, GpuUtilData>;
+  onInteract?: () => void;
+}) {
   const modes = useMemo(() => Object.keys(data), [data]);
   const [mode, setMode] = useState(modes[0] ?? "naive");
   const [hover, setHover] = useState<{ row: number; col: number } | null>(null);
@@ -27,7 +33,10 @@ export default function GpuUtilPanel({ data }: { data: Record<string, GpuUtilDat
           {modes.map((m) => (
             <button
               key={m}
-              onClick={() => setMode(m)}
+              onClick={() => {
+                setMode(m);
+                onInteract?.();
+              }}
               className={`px-2.5 py-1 rounded-full transition-colors ${
                 mode === m ? "bg-stone-900 text-white" : "text-stone-600 hover:text-stone-900"
               }`}
