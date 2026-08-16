@@ -78,20 +78,23 @@ export default function Navbar() {
   // useTransform, not the isScrolled boolean) so the slide feels glued to
   // the actual scroll gesture instead of lagging a frame or two behind a
   // state update — this is what made it look "not quite right" before.
-  // transform/opacity are cheap to animate continuously; backdrop-filter is
-  // not, so unlike navBackground/backdropBlur above, the mobile pills use a
-  // constant frosted-glass value — always visibly blurred, even at the very
-  // top of the page — rather than fading in with scroll. A fixed value also
-  // costs nothing extra to maintain (no recalculation at all after first
-  // paint) vs. up to 6 pill elements independently recalculating blur every
-  // scroll frame, which is one of the most expensive things to animate on
-  // iOS Safari and the likely source of the reported slowness.
+  // transform/opacity are cheap to animate continuously. backdrop-filter is
+  // not — the earlier fix (a constant blur value, not one recalculated per
+  // scroll frame) turned out not to be enough, because blur has to keep
+  // re-sampling whatever page content sits behind it as that content
+  // scrolls past, independent of whether the blur amount itself is
+  // changing. That cost is real on iOS Safari even for a single blurred
+  // layer, and mobile stacks up to three (full header + hamburger pill +
+  // Contact/CV pill) versus desktop's one — matching the report that this
+  // is fine on desktop but very slow on iPhone specifically. So mobile
+  // drops backdrop-filter entirely and leans on a more opaque solid fill
+  // for legibility instead — desktop's navBackground/backdropBlur above are
+  // untouched.
   const fullHeaderY = useTransform(scrollY, [MOBILE_EXPAND_AT, MOBILE_COLLAPSE_AT], [0, -72]);
   const fullHeaderOpacity = useTransform(scrollY, [MOBILE_EXPAND_AT, MOBILE_COLLAPSE_AT], [1, 0]);
   const reducedHeaderY = useTransform(scrollY, [MOBILE_EXPAND_AT, MOBILE_COLLAPSE_AT], [-72, 0]);
   const reducedHeaderOpacity = useTransform(scrollY, [MOBILE_EXPAND_AT, MOBILE_COLLAPSE_AT], [0, 1]);
-  const mobileNavBg = 'rgba(255, 255, 255, 0.55)';
-  const mobileNavBlur = 'blur(10px)';
+  const mobileNavBg = 'rgba(253, 252, 250, 0.92)';
 
   const navItems = [
     { id: 'home', label: 'Home' },
@@ -254,8 +257,6 @@ export default function Navbar() {
           <motion.div
             style={{
               backgroundColor: mobileNavBg,
-              backdropFilter: mobileNavBlur,
-              WebkitBackdropFilter: mobileNavBlur,
             }}
             className="rounded-2xl border border-black/10 shadow-lg shadow-black/5"
           >
@@ -299,8 +300,6 @@ export default function Navbar() {
           <motion.div
             style={{
               backgroundColor: mobileNavBg,
-              backdropFilter: mobileNavBlur,
-              WebkitBackdropFilter: mobileNavBlur,
             }}
             className="relative rounded-2xl border border-black/10 shadow-lg shadow-black/5"
           >
@@ -331,8 +330,6 @@ export default function Navbar() {
                       key={item.id}
                       style={{
                         backgroundColor: mobileNavBg,
-                        backdropFilter: mobileNavBlur,
-                        WebkitBackdropFilter: mobileNavBlur,
                       }}
                       className="rounded-xl border border-black/10 shadow-lg shadow-black/5"
                     >
@@ -353,8 +350,6 @@ export default function Navbar() {
           <motion.div
             style={{
               backgroundColor: mobileNavBg,
-              backdropFilter: mobileNavBlur,
-              WebkitBackdropFilter: mobileNavBlur,
             }}
             className="rounded-2xl border border-black/10 shadow-lg shadow-black/5"
           >
