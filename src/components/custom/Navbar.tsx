@@ -8,17 +8,20 @@ export default function Navbar() {
   const [activeSection, setActiveSection] = useState('home');
   const { scrollY } = useScroll();
 
-  // Transform scroll into blur and background opacity
+  // Transform scroll into blur and background opacity — capped well below
+  // fully opaque so the floating pill keeps its glassy, see-through quality
+  // the whole way down the page instead of settling into a near-solid white
+  // bar once scrolled past the hero.
   const navBackground = useTransform(
     scrollY,
     [0, 100],
-    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.8)']
+    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.45)']
   );
 
   const backdropBlur = useTransform(
     scrollY,
     [0, 100],
-    ['blur(0px)', 'blur(12px)']
+    ['blur(0px)', 'blur(8px)']
   );
 
   const navItems = [
@@ -60,14 +63,19 @@ export default function Navbar() {
     <>
       {/* Desktop Navbar */}
       <motion.nav
-        style={{
-          backgroundColor: navBackground,
-          backdropFilter: backdropBlur,
-          WebkitBackdropFilter: backdropBlur,
-        }}
         className="fixed top-6 left-1/2 -translate-x-1/2 z-50 hidden lg:block"
       >
-        <div className="px-6 py-1 rounded-full border border-black/10 shadow-2xl shadow-black/5">
+        {/* Background/blur live on this rounded element, not the outer nav
+            (which has no border-radius) — otherwise the blur paints as a
+            plain rectangle that pokes out past the pill's rounded corners. */}
+        <motion.div
+          style={{
+            backgroundColor: navBackground,
+            backdropFilter: backdropBlur,
+            WebkitBackdropFilter: backdropBlur,
+          }}
+          className="px-6 py-1 rounded-full border border-black/10 shadow-2xl shadow-black/5"
+        >
           <div className="flex items-center gap-2">
             {navItems.map((item, index) => (
               <motion.button
@@ -123,7 +131,7 @@ export default function Navbar() {
               CV
             </motion.a>
           </div>
-        </div>
+        </motion.div>
       </motion.nav>
 
       {/* Mobile Navbar — floating rounded pill/card, same language as the
