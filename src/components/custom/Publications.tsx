@@ -4,7 +4,7 @@ import { publications } from '@/data/cv';
 
 export default function Publications() {
   return (
-    <section id="publications" className="py-16 md:py-32 px-4 sm:px-6 bg-zinc-50">
+    <section id="publications" className="py-16 md:py-32 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto">
 
         <Reveal>
