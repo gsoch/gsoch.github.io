@@ -126,16 +126,18 @@ export default function Navbar() {
         </div>
       </motion.nav>
 
-      {/* Mobile Navbar */}
+      {/* Mobile Navbar — floating rounded pill/card, same language as the
+          desktop nav, instead of a full-bleed hard-cornered bar (which read
+          as a flat white rectangle once scrolled). */}
       <motion.nav
         style={{
           backgroundColor: navBackground,
           backdropFilter: backdropBlur,
           WebkitBackdropFilter: backdropBlur,
         }}
-        className="fixed top-0 left-0 right-0 z-50 lg:hidden"
+        className="fixed top-4 left-4 right-4 z-50 lg:hidden rounded-2xl border border-black/10 shadow-lg shadow-black/5 overflow-hidden"
       >
-        <div className="px-6 py-4 flex items-center justify-between border-b border-black/5">
+        <div className="px-5 py-3 flex items-center justify-between">
           <motion.div
             className="text-xl font-bold tracking-wide"
             initial={{ opacity: 0, x: -20 }}
@@ -161,7 +163,7 @@ export default function Navbar() {
             opacity: isOpen ? 1 : 0,
           }}
           transition={{ duration: 0.3, ease: 'easeInOut' }}
-          className="overflow-hidden bg-white/95 backdrop-blur-xl border-b border-black/5"
+          className="overflow-hidden bg-white/95 backdrop-blur-xl border-t border-black/5"
         >
           <div className="px-6 py-6 space-y-2">
             {navItems.map((item, index) => (
