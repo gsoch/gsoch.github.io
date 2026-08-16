@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { motion } from "motion/react";
 import { topology, network, roofline, gpuUtil } from "@/data/hdes";
 import TopologyPanel from "@/components/custom/hdes/TopologyPanel";
 import NetworkPanel from "@/components/custom/hdes/NetworkPanel";
@@ -24,6 +24,16 @@ const INTERACT_HOLD_MS = 20000;
 export default function HDESShowcase() {
   const [tab, setTab] = useState<TabId>("topology");
   const [delay, setDelay] = useState(ROTATE_MS);
+  // Every panel stays mounted (stacked via absolute positioning), and only
+  // opacity crosses over — a real simultaneous crossfade instead of
+  // AnimatePresence's exit-then-enter (mode="wait", which left a blank gap
+  // and read as a hard cut) or exit-and-enter-at-once-with-popLayout (which
+  // fought the container's own height animation and produced a double-motion
+  // snap). Container height is measured and animated explicitly so it's
+  // fully decoupled from that crossfade rather than relying on framer's
+  // automatic `layout` detection, which is what kept producing jank here.
+  const panelRefs = useRef<Partial<Record<TabId, HTMLDivElement | null>>>({});
+  const [height, setHeight] = useState<number | "auto">("auto");
   // Bumped on every interaction so the effect below always restarts the
   // interval, even when `delay` is set to the same value it already had
   // (e.g. clicking Imp. 1 then Imp. 2 both set delay=INTERACT_HOLD_MS —
@@ -54,8 +64,25 @@ export default function HDESShowcase() {
     setResetTick((n) => n + 1);
   };
 
+  // Measure before paint so height is already correct for the very first
+  // frame, then re-measure whenever the active tab changes or its own panel
+  // resizes (the SVGs are aspect-locked to width via viewBox, so a viewport
+  // resize changes their rendered pixel height too, not just tab switches).
+  useLayoutEffect(() => {
+    const el = panelRefs.current[tab];
+    if (el) setHeight(el.scrollHeight);
+  }, [tab]);
+
+  useEffect(() => {
+    const el = panelRefs.current[tab];
+    if (!el) return;
+    const ro = new ResizeObserver(() => setHeight(el.scrollHeight));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [tab]);
+
   return (
-    <div className="w-full max-w-2xl rounded-2xl border border-stone-200 bg-white/60 backdrop-blur-xl shadow-sm p-4 md:p-6 space-y-5 md:space-y-6">
+    <div className="w-full max-w-2xl lg:max-w-3xl rounded-2xl border border-stone-200 bg-white/60 backdrop-blur-xl shadow-sm p-4 md:p-6 space-y-5 md:space-y-6">
       <div>
         <div className="text-sm text-stone-500">HDES &middot; Heterogeneous Discrete-Event Simulator</div>
         <div className="text-lg font-medium">Distributed MoE Communication</div>
@@ -82,28 +109,36 @@ export default function HDESShowcase() {
         ))}
       </div>
 
-      {/* Each tab's panel sizes to its own natural content — `layout`
-          animates the height change smoothly when that differs between
-          tabs, instead of an abrupt snap or forcing every tab into the
-          tallest one's height (which left dead space under shorter
-          panels like GPU). Within a panel, hover-triggered UI must reserve
-          its own space rather than mounting/unmounting — see each panel's
-          own fixed-height hover row. */}
-      <motion.div layout transition={{ duration: 0.35, ease: "easeInOut" }}>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={tab}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: "easeInOut" }}
+      {/* All four panels stay mounted and stacked; only the active one sits
+          in flow (defining the measured height above) while the rest sit
+          absolutely on top of it. Switching tabs crossfades opacity on both
+          the outgoing and incoming panel at once, while the container's
+          height tweens independently to the newly-measured value — no
+          exit/enter mount timing to fight. */}
+      <motion.div
+        className="relative overflow-hidden"
+        animate={{ height }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
+      >
+        {TABS.map((t) => (
+          <div
+            key={t.id}
+            ref={(el) => {
+              panelRefs.current[t.id] = el;
+            }}
+            aria-hidden={t.id !== tab}
+            className={`transition-opacity duration-300 ease-in-out ${
+              t.id === tab
+                ? "relative opacity-100"
+                : "absolute inset-x-0 top-0 opacity-0 pointer-events-none"
+            }`}
           >
-            {tab === "topology" && <TopologyPanel data={topology} onInteract={onInteract} />}
-            {tab === "network" && <NetworkPanel data={network} onInteract={onInteract} />}
-            {tab === "roofline" && <RooflinePanel data={roofline} onInteract={onInteract} />}
-            {tab === "gpu" && <GpuUtilPanel data={gpuUtil} onInteract={onInteract} />}
-          </motion.div>
-        </AnimatePresence>
+            {t.id === "topology" && <TopologyPanel data={topology} onInteract={onInteract} />}
+            {t.id === "network" && <NetworkPanel data={network} onInteract={onInteract} />}
+            {t.id === "roofline" && <RooflinePanel data={roofline} onInteract={onInteract} />}
+            {t.id === "gpu" && <GpuUtilPanel data={gpuUtil} onInteract={onInteract} />}
+          </div>
+        ))}
       </motion.div>
     </div>
   );

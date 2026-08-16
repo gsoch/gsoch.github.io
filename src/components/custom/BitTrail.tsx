@@ -15,10 +15,6 @@ const LIFE_MS = 1100;
 const MAX_BITS = 160;
 const SPAWN_MIN_DIST = 14; // px moved before spawning the next bit — throttles the trail density
 
-// Soft indigo, same hue family as the GPU utilization heatmap
-// (see hdes/colors.ts:utilizationColor) for a bit of visual continuity.
-const HUE = 243;
-
 export default function BitTrail() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const bitsRef = useRef<Bit[]>([]);
@@ -26,6 +22,13 @@ export default function BitTrail() {
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
+    // Touch-primary devices: "mouse move" doesn't apply, and pointermove
+    // also fires from touch-scroll gestures, which would spawn particles
+    // and keep this rAF loop's continuous full-viewport clear+redraw
+    // running throughout every scroll — a real cost that showed up as
+    // general jank (nav transitions, HDES card crossfades) on iPhone.
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -78,9 +81,8 @@ export default function BitTrail() {
         b.y += b.vy;
         b.vy += 0.0015; // gentle settle, so the "rise" eases off like a ripple losing energy
         const alpha = (1 - age) * 0.55;
-        const lightness = 30 + age * 35;
         ctx.font = `${b.size}px "SF Mono", "Fira Code", monospace`;
-        ctx.fillStyle = `hsla(${HUE}, 55%, ${lightness}%, ${alpha})`;
+        ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(b.char, b.x, b.y);
@@ -99,7 +101,7 @@ export default function BitTrail() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-40"
+      className="fixed inset-0 pointer-events-none z-40 hidden lg:block"
       aria-hidden="true"
     />
   );
