@@ -141,7 +141,7 @@ export default function TopologyPanel({
 
       <svg
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        className="w-full h-auto rounded-md border border-stone-200 bg-white"
+        className="w-full h-auto rounded-md border border-stone-200 bg-surface"
       >
         <g>
           {ovals.map((o) => (
@@ -151,8 +151,8 @@ export default function TopologyPanel({
                 cy={OVAL_CENTER_Y}
                 rx={o.rx}
                 ry={OVAL_RY}
-                fill="#fdfdfc"
-                stroke="#e7e5e4"
+                fill="#f7f3ec"
+                stroke="#e7e0d3"
                 strokeWidth={1}
               />
               <text x={o.cx - o.rx + 6} y={OVAL_CENTER_Y - OVAL_RY + 14} fontSize={8} fill="#a8a29e">

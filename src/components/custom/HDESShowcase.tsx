@@ -82,20 +82,29 @@ export default function HDESShowcase() {
         ))}
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={tab}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.35, ease: "easeInOut" }}
-        >
-          {tab === "topology" && <TopologyPanel data={topology} onInteract={onInteract} />}
-          {tab === "network" && <NetworkPanel data={network} onInteract={onInteract} />}
-          {tab === "roofline" && <RooflinePanel data={roofline} onInteract={onInteract} />}
-          {tab === "gpu" && <GpuUtilPanel data={gpuUtil} onInteract={onInteract} />}
-        </motion.div>
-      </AnimatePresence>
+      {/* Each tab's panel sizes to its own natural content — `layout`
+          animates the height change smoothly when that differs between
+          tabs, instead of an abrupt snap or forcing every tab into the
+          tallest one's height (which left dead space under shorter
+          panels like GPU). Within a panel, hover-triggered UI must reserve
+          its own space rather than mounting/unmounting — see each panel's
+          own fixed-height hover row. */}
+      <motion.div layout transition={{ duration: 0.35, ease: "easeInOut" }}>
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.div
+            key={tab}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: "easeInOut" }}
+          >
+            {tab === "topology" && <TopologyPanel data={topology} onInteract={onInteract} />}
+            {tab === "network" && <NetworkPanel data={network} onInteract={onInteract} />}
+            {tab === "roofline" && <RooflinePanel data={roofline} onInteract={onInteract} />}
+            {tab === "gpu" && <GpuUtilPanel data={gpuUtil} onInteract={onInteract} />}
+          </motion.div>
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

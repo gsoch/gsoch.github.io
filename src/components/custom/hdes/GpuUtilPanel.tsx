@@ -55,7 +55,7 @@ export default function GpuUtilPanel({
 
       <svg
         viewBox={`0 0 ${WIDTH} ${chartH + PAD_B}`}
-        className="w-full h-auto rounded-md border border-stone-200 bg-white"
+        className="w-full h-auto rounded-md border border-stone-200 bg-surface"
       >
         {d.gpu_ids.map((gid, row) => (
           <text
@@ -124,13 +124,17 @@ export default function GpuUtilPanel({
           </span>
           <span>0% &rarr; 100%</span>
         </div>
-        {hover && (
-          <div className="text-stone-600">
-            {shortId(d.gpu_ids[hover.row])} &middot; t=
-            {((hover.col / (d.n_bins - 1)) * d.sim_end_us).toFixed(0)}&micro;s &middot;{" "}
-            {(d.utilization[hover.row][hover.col] * 100).toFixed(0)}%
-          </div>
-        )}
+        <div className="text-stone-600">
+          {hover ? (
+            <>
+              {shortId(d.gpu_ids[hover.row])} &middot; t=
+              {((hover.col / (d.n_bins - 1)) * d.sim_end_us).toFixed(0)}&micro;s &middot;{" "}
+              {(d.utilization[hover.row][hover.col] * 100).toFixed(0)}%
+            </>
+          ) : (
+            <span className="text-stone-400">Hover the heatmap to inspect a cell</span>
+          )}
+        </div>
       </div>
     </div>
   );

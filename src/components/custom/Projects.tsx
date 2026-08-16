@@ -18,7 +18,7 @@ export default function Projects() {
         <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
           {projects.map((project, i) => (
             <Reveal key={project.title} delay={i * 0.08}>
-              <div className="h-full flex flex-col p-6 sm:p-8 bg-white border-2 border-zinc-100 rounded-3xl hover:border-black transition">
+              <div className="h-full flex flex-col p-6 sm:p-8 bg-surface border-2 border-zinc-100 rounded-3xl hover:border-black transition">
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <h3 className="text-lg sm:text-xl font-semibold leading-snug">{project.title}</h3>
                   <span className="text-sm text-zinc-500 whitespace-nowrap shrink-0">{project.date}</span>

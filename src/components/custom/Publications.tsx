@@ -23,7 +23,7 @@ export default function Publications() {
                 href={p.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex flex-col sm:flex-row gap-4 sm:gap-6 p-6 sm:p-8 bg-white border-2 border-zinc-100 rounded-3xl hover:border-black transition"
+                className="group flex flex-col sm:flex-row gap-4 sm:gap-6 p-6 sm:p-8 bg-surface border-2 border-zinc-100 rounded-3xl hover:border-black transition"
               >
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-black rounded-2xl flex items-center justify-center shrink-0">
                   <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
