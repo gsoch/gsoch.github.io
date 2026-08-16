@@ -132,3 +132,19 @@
     @apply font-sans;
   }
 }
+
+/* Technical-drawing texture: a fine dashed grid (like construction lines)
+   with small corner tick marks at every 4th intersection (like blueprint
+   registration marks) — both layered as tiled SVG backgrounds so they
+   scale with any section size and stay crisp at any zoom level. */
+@layer utilities {
+  .bg-blueprint {
+    /* Pantone 11-4201 TCX "Cloud Dancer" — 2026 color of the year */
+    background-color: #f0eee9;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cpath d='M0 0H96M0 0V96' fill='none' stroke='%23e2dfdb' stroke-width='1' stroke-dasharray='2 6'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='384' height='384'%3E%3Cpath d='M0 0H10M0 0V10' fill='none' stroke='%23c7c2bd' stroke-width='1'/%3E%3C/svg%3E");
+    background-size: 96px 96px, 384px 384px;
+    background-repeat: repeat, repeat;
+  }
+}

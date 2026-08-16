@@ -5,10 +5,12 @@ import Projects from '@/components/custom/Projects'
 import Publications from '@/components/custom/Publications'
 import Contact from '@/components/custom/Contact'
 import Footer from '@/components/custom/Footer'
+import BitTrail from '@/components/custom/BitTrail'
 
 function App() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-blueprint">
+      <BitTrail />
       <Navbar />
       <Hero />
       <FeaturedProject />

@@ -2,7 +2,7 @@ import HDESShowcase from "@/components/custom/HDESShowcase";
 
 export default function Hero() {
   return (
-    <section id="home" className="relative min-h-dvh bg-stone-50 text-stone-900">
+    <section id="home" className="relative min-h-dvh text-stone-900">
       <div className="mx-auto grid min-h-dvh max-w-400 grid-cols-1 md:grid-cols-2 items-start md:items-center gap-8 md:gap-16 px-4 md:px-12 py-14 md:py-10 mt-18 md:mt-0">
 
         {/* LEFT */}

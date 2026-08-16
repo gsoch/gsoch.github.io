@@ -3,7 +3,7 @@ import { featuredProject } from '@/data/cv';
 
 export default function FeaturedProject() {
   return (
-    <section id="work" className="py-16 md:py-32 px-4 sm:px-6 bg-stone-50 text-stone-900">
+    <section id="work" className="py-16 md:py-32 px-4 sm:px-6 text-stone-900">
       <div className="max-w-6xl mx-auto">
 
         <Reveal>

@@ -5,7 +5,7 @@ import { profile } from '@/data/cv';
 
 export default function Contact() {
   return (
-    <section id="contact" className="py-16 md:py-32 px-4 sm:px-6 bg-zinc-50">
+    <section id="contact" className="py-16 md:py-32 px-4 sm:px-6">
       <div className="max-w-3xl mx-auto text-center">
 
         <Reveal>
