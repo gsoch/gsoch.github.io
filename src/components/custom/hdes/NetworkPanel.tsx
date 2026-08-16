@@ -134,7 +134,7 @@ export default function NetworkPanel({
           Gather starts. Pipelined modes: real overlap). */}
       <svg
         viewBox={`0 0 ${WIDTH} ${GANTT_HEIGHT}`}
-        className="w-full h-auto rounded-md border border-stone-200 bg-white"
+        className="w-full h-auto rounded-md border border-stone-200 bg-surface"
       >
         {GANTT_ROW_LABELS.map((label, row) => (
           <g key={label}>
@@ -200,7 +200,7 @@ export default function NetworkPanel({
         )}
       </svg>
 
-      <svg viewBox={`0 0 ${WIDTH} ${CHART_HEIGHT}`} className="w-full h-auto rounded-md border border-stone-200 bg-white">
+      <svg viewBox={`0 0 ${WIDTH} ${CHART_HEIGHT}`} className="w-full h-auto rounded-md border border-stone-200 bg-surface">
         {PANEL_ORDER.map((t, i) => {
           const top = panelTop(i);
           const cap = d.link_caps_gbps[t];
@@ -284,34 +284,40 @@ export default function NetworkPanel({
         />
       </svg>
 
-      {hoverIdx !== null && (
-        <div className="flex items-center gap-2.5 text-xs rounded-md border border-stone-200 bg-stone-50 px-3 py-2 overflow-x-auto whitespace-nowrap">
-          <span className="text-stone-500 shrink-0">
-            t={((hoverIdx / (d.n_bins - 1)) * d.sim_end_us).toFixed(0)}&micro;s
-          </span>
-          {PANEL_ORDER.map((t) => (
-            <span key={t} className="flex items-center gap-1 shrink-0">
-              <span className="inline-block w-1.5 h-1.5 rounded-full" style={{ backgroundColor: LINK_COLORS[t] }} />
-              {LINK_SHORT[t]} {d.throughput_gbps[t][hoverIdx].toFixed(0)}
+      {/* Always mounted (never conditionally rendered) so hovering the
+          chart doesn't grow/shrink the card — only its content toggles. */}
+      <div className="flex items-center gap-2.5 text-xs rounded-md border border-stone-200 bg-surface px-3 py-2 overflow-x-auto whitespace-nowrap h-7.5">
+        {hoverIdx !== null ? (
+          <>
+            <span className="text-stone-500 shrink-0">
+              t={((hoverIdx / (d.n_bins - 1)) * d.sim_end_us).toFixed(0)}&micro;s
             </span>
-          ))}
-          <span className="text-stone-400 shrink-0">GB/s</span>
-          {activePhases.length > 0 && (
-            <span className="shrink-0">
-              {activePhases.map((p, i) => (
-                <span key={p} style={{ color: PHASE_COLORS[p] }} className="font-medium">
-                  {i > 0 && <span className="text-stone-400">+</span>}
-                  {PHASE_LABELS[p]}
-                </span>
-              ))}
-            </span>
-          )}
-        </div>
-      )}
+            {PANEL_ORDER.map((t) => (
+              <span key={t} className="flex items-center gap-1 shrink-0">
+                <span className="inline-block w-1.5 h-1.5 rounded-full" style={{ backgroundColor: LINK_COLORS[t] }} />
+                {LINK_SHORT[t]} {d.throughput_gbps[t][hoverIdx].toFixed(0)}
+              </span>
+            ))}
+            <span className="text-stone-400 shrink-0">GB/s</span>
+            {activePhases.length > 0 && (
+              <span className="shrink-0">
+                {activePhases.map((p, i) => (
+                  <span key={p} style={{ color: PHASE_COLORS[p] }} className="font-medium">
+                    {i > 0 && <span className="text-stone-400">+</span>}
+                    {PHASE_LABELS[p]}
+                  </span>
+                ))}
+              </span>
+            )}
+          </>
+        ) : (
+          <span className="text-stone-400">Hover the chart to inspect a point</span>
+        )}
+      </div>
 
       <div className="grid grid-cols-3 gap-2 text-xs">
         {PANEL_ORDER.map((t) => (
-          <div key={t} className="p-2.5 rounded-md bg-white border border-stone-200">
+          <div key={t} className="p-2.5 rounded-md bg-surface border border-stone-200">
             <div className="flex items-center gap-1.5 text-stone-500 mb-1">
               <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: LINK_COLORS[t] }} />
               {LINK_LABELS[t]}

@@ -57,14 +57,14 @@ export default function FeaturedProject() {
 
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 {featuredProject.metrics.map((m) => (
-                  <div key={m.label} className="p-3 sm:p-4 rounded-md bg-white border border-stone-200">
+                  <div key={m.label} className="p-3 sm:p-4 rounded-md bg-surface border border-stone-200">
                     <div className="text-xs text-stone-500 mb-1">{m.label}</div>
                     <div className="text-2xl sm:text-3xl font-light">{m.value}</div>
                   </div>
                 ))}
               </div>
 
-              <div className="p-3 sm:p-4 rounded-md bg-white border border-stone-200">
+              <div className="p-3 sm:p-4 rounded-md bg-surface border border-stone-200">
                 <div className="text-xs text-stone-500 mb-2">Validated against</div>
                 <div className="text-sm font-medium">DeepSeek-V4-Pro, under stress conditions</div>
               </div>

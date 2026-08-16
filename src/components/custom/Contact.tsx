@@ -32,7 +32,7 @@ export default function Contact() {
             <a
               href={profile.cv}
               download
-              className="inline-flex items-center gap-2 rounded-md border border-stone-300 bg-white px-6 py-3 text-sm hover:bg-stone-50 transition"
+              className="inline-flex items-center gap-2 rounded-md border border-stone-300 bg-surface px-6 py-3 text-sm hover:bg-white transition"
             >
               <Download className="w-4 h-4" />
               Download CV

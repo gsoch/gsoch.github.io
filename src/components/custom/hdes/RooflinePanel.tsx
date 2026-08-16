@@ -185,7 +185,7 @@ export default function RooflinePanel({
         ))}
       </div>
 
-      <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full h-auto rounded-md border border-stone-200 bg-white">
+      <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full h-auto rounded-md border border-stone-200 bg-surface">
         {yTicks.map((v) => (
           <g key={v}>
             <line x1={PAD_L} x2={WIDTH - PAD_R} y1={yAt(v)} y2={yAt(v)} stroke="#e7e5e4" strokeWidth={1} />
@@ -267,9 +267,10 @@ export default function RooflinePanel({
         </text>
       </svg>
 
-      {hover && (
-        <div className="text-xs rounded-md border border-stone-200 bg-stone-50 px-3 py-2">{hover.label}</div>
-      )}
+      {/* Always mounted so hovering a point doesn't grow/shrink the card. */}
+      <div className="text-xs rounded-md border border-stone-200 bg-surface px-3 py-2 h-7.5 overflow-x-auto whitespace-nowrap">
+        {hover ? hover.label : <span className="text-stone-400">Hover a point to inspect it</span>}
+      </div>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs">
         {LINK_ORDER.map((t) => (
