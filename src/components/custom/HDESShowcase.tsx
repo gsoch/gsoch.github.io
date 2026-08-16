@@ -90,7 +90,7 @@ export default function HDESShowcase() {
           its own space rather than mounting/unmounting — see each panel's
           own fixed-height hover row. */}
       <motion.div layout transition={{ duration: 0.35, ease: "easeInOut" }}>
-        <AnimatePresence mode="popLayout" initial={false}>
+        <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={tab}
             initial={{ opacity: 0 }}
