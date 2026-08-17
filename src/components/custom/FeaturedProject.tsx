@@ -7,7 +7,7 @@ export default function FeaturedProject() {
       <div className="max-w-6xl mx-auto">
 
         <Reveal>
-          <div className="inline-flex items-center rounded-full border border-stone-300 bg-white/60 px-3 py-1 md:px-4 text-xs md:text-sm tracking-[0.15em] md:tracking-[0.2em] uppercase backdrop-blur-sm mb-6 md:mb-8">
+          <div className="inline-flex items-center rounded-full border border-stone-300 bg-white/90 md:bg-white/60 px-3 py-1 md:px-4 text-xs md:text-sm tracking-[0.15em] md:tracking-[0.2em] uppercase backdrop-blur-none md:backdrop-blur-sm mb-6 md:mb-8">
             Featured Project
           </div>
         </Reveal>
@@ -44,7 +44,7 @@ export default function FeaturedProject() {
 
           {/* RIGHT: metrics panel, echoes Hero's demo card */}
           <Reveal delay={0.1}>
-            <div className="w-full rounded-2xl border border-stone-200 bg-white/60 backdrop-blur-xl shadow-sm p-5 sm:p-6 md:p-8 space-y-5 sm:space-y-6">
+            <div className="w-full rounded-2xl border border-stone-200 bg-white/95 md:bg-white/60 backdrop-blur-none md:backdrop-blur-xl shadow-sm p-5 sm:p-6 md:p-8 space-y-5 sm:space-y-6">
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <div className="text-sm text-stone-500">Simulator Output</div>

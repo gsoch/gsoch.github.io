@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { GpuUtilData } from "@/data/hdes";
 import { MODE_LABELS, utilizationColor } from "./colors";
 
@@ -33,6 +33,59 @@ export default function GpuUtilPanel({
   const cellW = (d.sim_end_us / sharedMaxUs) * (plotW / d.n_bins);
 
   const shortId = (id: string) => id.replace("rack", "r").replace("-gpu", "/g");
+
+  // The utilization grid used to be one <rect> per cell (~gpu_ids.length x
+  // n_bins, ~960 nodes for a full-scale run) each with its own onMouseEnter/
+  // onMouseLeave closures — mounting that whole tree on every tab switch to
+  // GPU was measured (via CPU-throttled profiling) to block the main thread
+  // for 400-500ms, by far the worst offender on the page. A canvas draws
+  // the same cells for a fraction of the cost and needs only one pair of
+  // pointer handlers total instead of one pair per cell. It sits in a
+  // <foreignObject> so it inherits the surrounding SVG's own viewBox
+  // scaling exactly like the <rect> grid did — flat-colored cells don't
+  // need per-device-pixel sharpness, so no separate DPR handling here
+  // (contrast BitTrail.tsx, which draws text and does need it).
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useLayoutEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    canvas.width = plotW;
+    canvas.height = chartH;
+    ctx.clearRect(0, 0, plotW, chartH);
+    d.utilization.forEach((row, ri) => {
+      row.forEach((v, ci) => {
+        const x = xAtUs((ci / d.n_bins) * d.sim_end_us) - PAD_L;
+        ctx.fillStyle = utilizationColor(v);
+        ctx.fillRect(x, ri * ROW_H, cellW + 0.5, ROW_H);
+      });
+    });
+    if (hover) {
+      const x = xAtUs((hover.col / d.n_bins) * d.sim_end_us) - PAD_L;
+      ctx.strokeStyle = "#1c1917";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x + 0.5, hover.row * ROW_H + 0.5, cellW - 0.5, ROW_H - 1);
+    }
+  }, [d, cellW, chartH, plotW, hover]);
+
+  const handleCanvasMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const scaleX = plotW / rect.width;
+    const scaleY = chartH / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    const row = Math.min(d.gpu_ids.length - 1, Math.max(0, Math.floor(y / ROW_H)));
+    const usAtX = (x / plotW) * sharedMaxUs; // inverse of xAtUs, in canvas-local (PAD_L-relative) coords
+    const frac = usAtX / d.sim_end_us;
+    const col = Math.min(d.n_bins - 1, Math.max(0, Math.round(frac * d.n_bins)));
+    if (frac < 0 || frac > 1.02) {
+      setHover((h) => (h ? null : h));
+      return;
+    }
+    setHover((h) => (h?.row === row && h?.col === col ? h : { row, col }));
+  };
 
   return (
     <div className="space-y-3">
@@ -70,23 +123,14 @@ export default function GpuUtilPanel({
           </text>
         ))}
 
-        {d.utilization.map((row, ri) =>
-          row.map((v, ci) => (
-            <rect
-              key={`${ri}-${ci}`}
-              x={xAtUs((ci / d.n_bins) * d.sim_end_us)}
-              y={ri * ROW_H}
-              width={cellW + 0.5}
-              height={ROW_H}
-              fill={utilizationColor(v)}
-              stroke={hover?.row === ri && hover?.col === ci ? "#1c1917" : "none"}
-              strokeWidth={hover?.row === ri && hover?.col === ci ? 1 : 0}
-              onMouseEnter={() => setHover({ row: ri, col: ci })}
-              onMouseLeave={() => setHover((h) => (h?.row === ri && h?.col === ci ? null : h))}
-              className="cursor-pointer"
-            />
-          )),
-        )}
+        <foreignObject x={PAD_L} y={0} width={plotW} height={chartH}>
+          <canvas
+            ref={canvasRef}
+            style={{ width: "100%", height: "100%", cursor: "pointer", display: "block" }}
+            onMouseMove={handleCanvasMove}
+            onMouseLeave={() => setHover(null)}
+          />
+        </foreignObject>
 
         {/* marks where this mode's own run actually ends, when it finishes
             before the slowest mode on the shared axis */}
