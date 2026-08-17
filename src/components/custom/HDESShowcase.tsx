@@ -24,25 +24,23 @@ const INTERACT_HOLD_MS = 20000;
 export default function HDESShowcase() {
   const [tab, setTab] = useState<TabId>("topology");
   const [delay, setDelay] = useState(ROTATE_MS);
-  // The crossfade needs the outgoing and incoming panel mounted
-  // simultaneously for ~450ms (see below), but permanently mounting all
-  // four was real dead weight — the GPU heatmap alone renders ~980 SVG
-  // nodes, topology another ~340, so keeping all four resident meant the
-  // page carried roughly 4x that DOM/paint cost at all times instead of
-  // only while a tab is actually active. Measured via Playwright: SVG
-  // nodes were over 80% of the page's entire DOM, which lines up with
-  // "the whole landing page is slow," not just this card. mountedTabs
-  // tracks which panels actually need to exist right now — normally just
-  // the active one, briefly two during a transition.
+  // Two attempts at a truly fixed (never-reshaping) card size were tried
+  // and measured here, both worse than what's below:
+  //  1. All four panels permanently mounted, CSS Grid sized to the
+  //     tallest one natively — 589-831ms per tab click, because every
+  //     click then re-renders all four panels' full trees (Topology's
+  //     ~50 nodes each carry inline onMouseEnter/onMouseLeave closures
+  //     that get new identities every render, forcing React to
+  //     unbind/rebind every one of those DOM listeners on every click,
+  //     not just when visiting that tab).
+  //  2. Only the active/transitioning panel(s) mounted, height ratcheted
+  //     up to the tallest seen so far via a plain CSS min-height
+  //     transition (no per-switch JS animation) — still 60-700ms+ and
+  //     erratic, confirmed on repeat runs (not measurement noise).
+  // What's left is the version that actually measured best (100-266ms):
+  // mount only the active tab plus the outgoing one for a short window,
+  // and animate height to the freshly measured value on every switch.
   const [mountedTabs, setMountedTabs] = useState<Set<TabId>>(() => new Set(["topology"]));
-  // Every mounted panel stays stacked via absolute positioning, and only
-  // opacity crosses over — a real simultaneous crossfade instead of
-  // AnimatePresence's exit-then-enter (mode="wait", which left a blank gap
-  // and read as a hard cut) or exit-and-enter-at-once-with-popLayout (which
-  // fought the container's own height animation and produced a double-motion
-  // snap). Container height is measured and animated explicitly so it's
-  // fully decoupled from that crossfade rather than relying on framer's
-  // automatic `layout` detection, which is what kept producing jank here.
   const panelRefs = useRef<Partial<Record<TabId, HTMLDivElement | null>>>({});
   const [height, setHeight] = useState<number | "auto">("auto");
   // Bumped on every interaction so the effect below always restarts the
