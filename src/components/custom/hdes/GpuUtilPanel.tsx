@@ -40,11 +40,16 @@ export default function GpuUtilPanel({
   // GPU was measured (via CPU-throttled profiling) to block the main thread
   // for 400-500ms, by far the worst offender on the page. A canvas draws
   // the same cells for a fraction of the cost and needs only one pair of
-  // pointer handlers total instead of one pair per cell. It sits in a
-  // <foreignObject> so it inherits the surrounding SVG's own viewBox
-  // scaling exactly like the <rect> grid did — flat-colored cells don't
-  // need per-device-pixel sharpness, so no separate DPR handling here
-  // (contrast BitTrail.tsx, which draws text and does need it).
+  // pointer handlers total instead of one pair per cell.
+  //
+  // It's positioned as a plain CSS overlay on top of the SVG (percentage-
+  // based left/top/width/height matching the SVG's own PAD_L/plotW/chartH
+  // proportions) rather than nested inside the SVG via <foreignObject> —
+  // foreignObject has a real history of inconsistent scaling, blurriness,
+  // and broken hit-testing in Safari/WebKit specifically, which is exactly
+  // where this was reported to look wrong. A CSS overlay has none of that
+  // risk since it's just two normal, independently-scaling elements sharing
+  // a parent, not SVG trying to host arbitrary HTML.
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useLayoutEffect(() => {
@@ -106,53 +111,60 @@ export default function GpuUtilPanel({
         ))}
       </div>
 
-      <svg
-        viewBox={`0 0 ${WIDTH} ${chartH + PAD_B}`}
-        className="w-full h-auto rounded-md border border-stone-200 bg-surface"
-      >
-        {d.gpu_ids.map((gid, row) => (
-          <text
-            key={gid}
-            x={PAD_L - 6}
-            y={row * ROW_H + ROW_H / 2 + 3}
-            textAnchor="end"
-            fontSize={7}
-            fill="#78716c"
-          >
-            {shortId(gid)}
+      <div className="relative">
+        <svg
+          viewBox={`0 0 ${WIDTH} ${chartH + PAD_B}`}
+          className="w-full h-auto rounded-md border border-stone-200 bg-surface"
+        >
+          {d.gpu_ids.map((gid, row) => (
+            <text
+              key={gid}
+              x={PAD_L - 6}
+              y={row * ROW_H + ROW_H / 2 + 3}
+              textAnchor="end"
+              fontSize={7}
+              fill="#78716c"
+            >
+              {shortId(gid)}
+            </text>
+          ))}
+
+          {/* marks where this mode's own run actually ends, when it
+              finishes before the slowest mode on the shared axis */}
+          {d.sim_end_us < sharedMaxUs * 0.995 && (
+            <line
+              x1={xAtUs(d.sim_end_us)}
+              x2={xAtUs(d.sim_end_us)}
+              y1={0}
+              y2={chartH}
+              stroke="#a8a29e"
+              strokeWidth={1}
+              strokeDasharray="1 2"
+            />
+          )}
+
+          <text x={PAD_L} y={chartH + 14} fontSize={8} fill="#78716c">
+            0
           </text>
-        ))}
+          <text x={WIDTH - PAD_R} y={chartH + 14} fontSize={8} fill="#78716c" textAnchor="end">
+            {Math.round(sharedMaxUs).toLocaleString()} &micro;s
+          </text>
+        </svg>
 
-        <foreignObject x={PAD_L} y={0} width={plotW} height={chartH}>
-          <canvas
-            ref={canvasRef}
-            style={{ width: "100%", height: "100%", cursor: "pointer", display: "block" }}
-            onMouseMove={handleCanvasMove}
-            onMouseLeave={() => setHover(null)}
-          />
-        </foreignObject>
-
-        {/* marks where this mode's own run actually ends, when it finishes
-            before the slowest mode on the shared axis */}
-        {d.sim_end_us < sharedMaxUs * 0.995 && (
-          <line
-            x1={xAtUs(d.sim_end_us)}
-            x2={xAtUs(d.sim_end_us)}
-            y1={0}
-            y2={chartH}
-            stroke="#a8a29e"
-            strokeWidth={1}
-            strokeDasharray="1 2"
-          />
-        )}
-
-        <text x={PAD_L} y={chartH + 14} fontSize={8} fill="#78716c">
-          0
-        </text>
-        <text x={WIDTH - PAD_R} y={chartH + 14} fontSize={8} fill="#78716c" textAnchor="end">
-          {Math.round(sharedMaxUs).toLocaleString()} &micro;s
-        </text>
-      </svg>
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: "absolute",
+            left: `${(PAD_L / WIDTH) * 100}%`,
+            top: 0,
+            width: `${(plotW / WIDTH) * 100}%`,
+            height: `${(chartH / (chartH + PAD_B)) * 100}%`,
+            cursor: "pointer",
+          }}
+          onMouseMove={handleCanvasMove}
+          onMouseLeave={() => setHover(null)}
+        />
+      </div>
 
       <div className="flex items-center justify-between text-xs">
         <div className="flex items-center gap-1.5 text-stone-500">
