@@ -24,7 +24,18 @@ const INTERACT_HOLD_MS = 20000;
 export default function HDESShowcase() {
   const [tab, setTab] = useState<TabId>("topology");
   const [delay, setDelay] = useState(ROTATE_MS);
-  // Every panel stays mounted (stacked via absolute positioning), and only
+  // The crossfade needs the outgoing and incoming panel mounted
+  // simultaneously for ~450ms (see below), but permanently mounting all
+  // four was real dead weight — the GPU heatmap alone renders ~980 SVG
+  // nodes, topology another ~340, so keeping all four resident meant the
+  // page carried roughly 4x that DOM/paint cost at all times instead of
+  // only while a tab is actually active. Measured via Playwright: SVG
+  // nodes were over 80% of the page's entire DOM, which lines up with
+  // "the whole landing page is slow," not just this card. mountedTabs
+  // tracks which panels actually need to exist right now — normally just
+  // the active one, briefly two during a transition.
+  const [mountedTabs, setMountedTabs] = useState<Set<TabId>>(() => new Set(["topology"]));
+  // Every mounted panel stays stacked via absolute positioning, and only
   // opacity crosses over — a real simultaneous crossfade instead of
   // AnimatePresence's exit-then-enter (mode="wait", which left a blank gap
   // and read as a hard cut) or exit-and-enter-at-once-with-popLayout (which
@@ -81,6 +92,16 @@ export default function HDESShowcase() {
     return () => ro.disconnect();
   }, [tab]);
 
+  // Keep the outgoing panel mounted just long enough for its opacity fade
+  // (300ms) and the container's height tween (400ms) to finish, then drop
+  // it — a manual timer instead of AnimatePresence's automatic exit
+  // lifecycle, which is what raced against the height animation before.
+  useEffect(() => {
+    setMountedTabs((prev) => (prev.has(tab) ? prev : new Set(prev).add(tab)));
+    const timeout = setTimeout(() => setMountedTabs(new Set([tab])), 450);
+    return () => clearTimeout(timeout);
+  }, [tab]);
+
   return (
     <div className="w-full max-w-2xl lg:max-w-3xl rounded-2xl border border-stone-200 bg-white/60 backdrop-blur-xl shadow-sm p-4 md:p-6 space-y-5 md:space-y-6">
       <div>
@@ -109,18 +130,20 @@ export default function HDESShowcase() {
         ))}
       </div>
 
-      {/* All four panels stay mounted and stacked; only the active one sits
-          in flow (defining the measured height above) while the rest sit
-          absolutely on top of it. Switching tabs crossfades opacity on both
-          the outgoing and incoming panel at once, while the container's
-          height tweens independently to the newly-measured value — no
-          exit/enter mount timing to fight. */}
+      {/* Only mountedTabs are in the DOM — normally just the active one, and
+          the outgoing one too for ~450ms during a switch (see above). The
+          active panel sits in flow (defining the measured height above)
+          while any transitional other sits absolutely on top of it.
+          Switching tabs crossfades opacity on both the outgoing and
+          incoming panel at once, while the container's height tweens
+          independently to the newly-measured value — no exit/enter mount
+          timing to fight. */}
       <motion.div
         className="relative overflow-hidden"
         animate={{ height }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
       >
-        {TABS.map((t) => (
+        {TABS.filter((t) => mountedTabs.has(t.id)).map((t) => (
           <div
             key={t.id}
             ref={(el) => {
