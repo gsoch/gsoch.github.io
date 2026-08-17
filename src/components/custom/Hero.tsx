@@ -78,7 +78,7 @@ export default function Hero() {
           className="flex flex-col justify-center items-center text-center md:items-start md:text-left space-y-5 md:space-y-8 mb-16 md:mb-15"
         >
 
-          <div className="inline-flex w-fit items-center rounded-full border border-stone-300 bg-white/60 px-3 py-1 md:px-4 text-xs md:text-sm tracking-[0.15em] md:tracking-[0.2em] uppercase backdrop-blur-sm">
+          <div className="inline-flex w-fit items-center rounded-full border border-stone-300 bg-white/90 md:bg-white/60 px-3 py-1 md:px-4 text-xs md:text-sm tracking-[0.15em] md:tracking-[0.2em] uppercase backdrop-blur-none md:backdrop-blur-sm">
             MASc &middot; Computer Engineering &middot; UofT
           </div>
 

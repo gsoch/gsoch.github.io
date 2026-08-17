@@ -103,7 +103,13 @@ export default function HDESShowcase() {
   }, [tab]);
 
   return (
-    <div className="w-full max-w-2xl lg:max-w-3xl rounded-2xl border border-stone-200 bg-white/60 backdrop-blur-xl shadow-sm p-4 md:p-6 space-y-5 md:space-y-6">
+    // Solid on mobile, frosted glass on desktop — this card's content
+    // changes constantly (10s auto-rotate, tab clicks, hover), so its
+    // backdrop-blur can never settle into a cheap cached state; it has to
+    // keep re-sampling on every repaint. Confirmed as a major contributor
+    // to the reported mobile slowness (right where the header slowness was
+    // also reported: scrolling to and interacting with this exact card).
+    <div className="w-full max-w-2xl lg:max-w-3xl rounded-2xl border border-stone-200 bg-white/95 md:bg-white/60 backdrop-blur-none md:backdrop-blur-xl shadow-sm p-4 md:p-6 space-y-5 md:space-y-6">
       <div>
         <div className="text-sm text-stone-500">HDES &middot; Heterogeneous Discrete-Event Simulator</div>
         <div className="text-lg font-medium">Distributed MoE Communication</div>
