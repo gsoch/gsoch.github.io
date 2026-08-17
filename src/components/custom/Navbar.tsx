@@ -7,8 +7,8 @@ const NAV_ICONS = { home: Home, work: Briefcase, publications: BookOpen, contact
 // Two thresholds (not one) so a scroll position hovering right at the edge
 // doesn't flicker the nav between merged/split every frame — collapse a bit
 // later than it expands.
-const MOBILE_COLLAPSE_AT = 80;
-const MOBILE_EXPAND_AT = 40;
+const MOBILE_COLLAPSE_AT = 260;
+const MOBILE_EXPAND_AT = 100;
 // Shared easing so the full header's slide-out and the reduced header's
 // slide-in read as one continuous motion rather than two separate timings.
 const NAV_EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
@@ -94,7 +94,7 @@ export default function Navbar() {
   const fullHeaderOpacity = useTransform(scrollY, [MOBILE_EXPAND_AT, MOBILE_COLLAPSE_AT], [1, 0]);
   const reducedHeaderY = useTransform(scrollY, [MOBILE_EXPAND_AT, MOBILE_COLLAPSE_AT], [-72, 0]);
   const reducedHeaderOpacity = useTransform(scrollY, [MOBILE_EXPAND_AT, MOBILE_COLLAPSE_AT], [0, 1]);
-  const mobileNavBg = 'rgba(253, 252, 250, 0.92)';
+  const mobileNavBg = '#ffffff';
 
   const navItems = [
     { id: 'home', label: 'Home' },
