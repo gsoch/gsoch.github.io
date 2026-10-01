@@ -103,7 +103,7 @@ export default function Hero() {
               Accelerating AI, from architecture to algorithm.
             </h1>
 
-            <div className="flex items-center gap-3 md:gap-4">
+            <div className="flex items-center justify-center md:justify-start gap-3 md:gap-4">
               <div className="relative flex size-12 md:size-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-stone-300 bg-white text-sm md:text-base font-semibold text-stone-700 shadow-sm">
                 GO
                 {/* Drop a photo at public/profile.jpg to replace the initials. */}
@@ -122,7 +122,7 @@ export default function Hero() {
               </div>
             </div>
 
-            <p className="text-base md:text-lg leading-6 md:leading-7 text-stone-600 text-pretty" style={{ width: lede, maxWidth: "100%" }}>
+            <p className="text-base md:text-lg leading-6 md:leading-7 text-stone-600 text-pretty mx-auto md:mx-0" style={{ width: lede, maxWidth: "100%" }}>
               Hardware/software co-design engineer specializing in large-scale HPC and AI systems.
             </p>
           </div>
