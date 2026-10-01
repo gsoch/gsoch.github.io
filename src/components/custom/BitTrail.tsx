@@ -12,13 +12,15 @@ interface Bit {
 }
 
 const LIFE_MS = 1100;
-const MAX_BITS = 160;
-const SPAWN_MIN_DIST = 14; // px moved before spawning the next bit — throttles the trail density
+const MAX_BITS = 80;
+const SPAWN_MIN_DIST = 40; // px moved before spawning the next bit — keeps the trail sparse
+const SPAWN_MIN_INTERVAL_MS = 90; // and never more often than this, so fast swipes stay broken up
 
 export default function BitTrail() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const bitsRef = useRef<Bit[]>([]);
   const lastPosRef = useRef<{ x: number; y: number } | null>(null);
+  const lastSpawnRef = useRef(0);
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -62,10 +64,15 @@ export default function BitTrail() {
     };
 
     const handlePointerMove = (e: PointerEvent) => {
+      // Elements can opt out of the trail (e.g. the interactive hero card).
+      if (e.target instanceof Element && e.target.closest("[data-no-trail]")) return;
       const last = lastPosRef.current;
+      const now = performance.now();
+      if (now - lastSpawnRef.current < SPAWN_MIN_INTERVAL_MS) return;
       if (!last || Math.hypot(e.clientX - last.x, e.clientY - last.y) >= SPAWN_MIN_DIST) {
         spawn(e.clientX, e.clientY);
         lastPosRef.current = { x: e.clientX, y: e.clientY };
+        lastSpawnRef.current = now;
       }
     };
     window.addEventListener("pointermove", handlePointerMove, { passive: true });

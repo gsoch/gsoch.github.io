@@ -155,3 +155,7 @@
     background-color: #fdfcfa;
   }
 }
+@keyframes hero-flow-y { to { background-position: 0 10px; } }
+@keyframes hero-dash { to { stroke-dashoffset: -20; } }
+@keyframes hero-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@keyframes hero-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
