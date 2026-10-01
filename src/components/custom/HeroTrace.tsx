@@ -483,7 +483,7 @@ const PHASES = [
   {
     us: RUN_US,
     workload: "Implementation 3",
-    fix: "In-network acceleration achieves ~3× by coordinating Ethernet and NVLink traffic while parallelizing GPU compute queues.",
+    fix: "In-network acceleration achieves ~3× by coordinating Ethernet and NVLink traffic while parallelizing GPU compute.",
     jitter: 0,
     eth: norm(REAL_ETH, RUN_US, 930),
     pcPts: norm(REAL_SM, RUN_US, 110),
