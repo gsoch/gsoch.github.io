@@ -1,25 +1,11 @@
-import Navbar from '@/components/custom/Navbar'
-import Hero from '@/components/custom/Hero'
-import FeaturedProject from '@/components/custom/FeaturedProject'
-import Projects from '@/components/custom/Projects'
-import Publications from '@/components/custom/Publications'
-import Contact from '@/components/custom/Contact'
-import Footer from '@/components/custom/Footer'
-import BitTrail from '@/components/custom/BitTrail'
+import Desktop from '@/portfolio/Desktop'
+import Mobile from '@/portfolio/Mobile'
+import { useMediaQuery } from '@/portfolio/hooks'
 
+// Two separately designed layouts (Claude Design: Portfolio / Portfolio Mobile).
 function App() {
-  return (
-    <div className="min-h-screen bg-blueprint">
-      <BitTrail />
-      <Navbar />
-      <Hero />
-      <FeaturedProject />
-      <Projects />
-      <Publications />
-      <Contact />
-      <Footer />
-    </div>
-  )
+  const mobile = useMediaQuery('(max-width: 767px)')
+  return mobile ? <Mobile /> : <Desktop />
 }
 
 export default App

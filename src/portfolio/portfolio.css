@@ -1,0 +1,56 @@
+/* Navy/gold theme from the Claude Design project. Layout lives inline in the
+   components; this file holds the page base, keyframes and interaction states
+   (inline styles can't express :hover / :active). */
+
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background-color: #0d1526;
+  background-image:
+    linear-gradient(rgba(148,163,184,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148,163,184,.055) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: #eef1f6;
+  font-family: 'Inter Variable', Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'cv11', 'ss01';
+}
+body.pf-mobile { background: #0a1120; }
+
+a { color: #e9b949; text-decoration: none; }
+a:hover { color: #f5d27e; }
+::selection { background: #e9b949; color: #0d1526; }
+
+.pf-serif { font-family: Newsreader, Georgia, serif; font-style: italic; font-weight: 400; }
+.pf-em { color: #eef1f6; font-family: Newsreader, Georgia, serif; font-style: italic; font-size: 1.08em; }
+
+@keyframes shellShake { 0%,70%,100% { transform: rotate(0) } 74% { transform: rotate(-9deg) } 78% { transform: rotate(7deg) } 82% { transform: rotate(-5deg) } 86% { transform: rotate(3deg) } 90% { transform: rotate(0) } }
+@keyframes scrollCue { 0% { transform: translateY(-100%) } 60%,100% { transform: translateY(250%) } }
+@keyframes cellFlow { 0%,100% { background-color: rgba(233,185,73,.26) } 25% { background-color: rgba(233,185,73,.46) } 60% { background-color: rgba(233,185,73,.26) } }
+@keyframes cellFlowSoft { 0%,100% { background-color: rgba(233,185,73,.14) } 25% { background-color: rgba(233,185,73,.28) } 60% { background-color: rgba(233,185,73,.14) } }
+@media (prefers-reduced-motion: reduce) { [data-cell] { animation: none !important; } }
+
+/* Nav text links */
+.pf-nav { color: #9aa6b8; }
+.pf-nav:hover { color: #e9b949; }
+
+/* Round icon buttons (social / contact) */
+.pf-circle { display: grid; place-items: center; box-sizing: border-box; border: 1px solid rgba(148,163,184,.35); border-radius: 50%; color: #eef1f6; transition: border-color .2s, color .2s; }
+.pf-circle:hover, .pf-circle:active { border-color: #e9b949; color: #e9b949; }
+
+.pf-cv { color: #e9b949; border: 1px solid rgba(233,185,73,.55); }
+.pf-cv:hover { background: rgba(233,185,73,.1); color: #f5d27e; }
+
+.pf-row { transition: background .25s; }
+.pf-row:hover { background: rgba(233,185,73,.05); }
+.pf-row:active { background: rgba(233,185,73,.06); }
+
+.pf-pub, .pf-pub:hover { color: #eef1f6; }
+.pf-pub { border: 1px solid rgba(148,163,184,.2); background: #0f1829; transition: border-color .25s, background .25s; }
+.pf-pub:hover { border-color: #e9b949; background: #111c31; }
+
+.pf-close { color: #eef1f6; }
+.pf-close:hover { color: #e9b949; }
+
+.pf-cue { color: #9aa6b8; }
+.pf-cue:hover { color: #e9b949; }
