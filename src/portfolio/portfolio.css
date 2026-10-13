@@ -22,7 +22,7 @@ a:hover { color: #f5d27e; }
 ::selection { background: #e9b949; color: #0d1526; }
 
 .pf-serif { font-family: Newsreader, Georgia, serif; font-style: italic; font-weight: 400; }
-.pf-em { color: #eef1f6; font-family: Newsreader, Georgia, serif; font-style: italic; font-size: 1.08em; }
+.pf-em { color: #eef1f6; font-weight: 500; }
 
 @keyframes shellShake { 0%,70%,100% { transform: rotate(0) } 74% { transform: rotate(-9deg) } 78% { transform: rotate(7deg) } 82% { transform: rotate(-5deg) } 86% { transform: rotate(3deg) } 90% { transform: rotate(0) } }
 @keyframes scrollCue { 0% { transform: translateY(-100%) } 60%,100% { transform: translateY(250%) } }
